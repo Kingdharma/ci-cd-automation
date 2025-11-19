@@ -62,7 +62,7 @@ jobs:
           mvn versions:display-dependency-updates -B 2>&1 | tee -a update-report.md || true
 
       - name: Upload update report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dependency-update-report
           path: update-report.md
