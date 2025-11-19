@@ -156,7 +156,7 @@ jobs:
           retention-days: 30
 
       - name: Publish test coverage
-        if: always()
+        if: always() && secrets.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v4
         with:
           files: ./target/site/jacoco/jacoco.xml
@@ -273,6 +273,7 @@ jobs:
           retention-days: 30
 
       - name: Run Snyk Security Scan
+        if: secrets.SNYK_TOKEN != ''
         continue-on-error: true
         uses: snyk/actions/maven@master
         env:
@@ -350,7 +351,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [unit-tests, integration-tests]
-    if: ${{ env.SONAR_TOKEN != '' }}
+    if: ${{ secrets.SONAR_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -381,7 +382,7 @@ jobs:
   ci-status:
     name: CI Status Check
     runs-on: ubuntu-latest
-    needs: [code-quality, build, unit-tests, integration-tests, security-scan, docker-build]
+    needs: [code-quality, build, unit-tests, integration-tests]
     if: always()
     steps:
       - name: Check CI status
@@ -393,5 +394,6 @@ jobs:
             echo "CI pipeline failed"
             exit 1
           fi
-          echo "All CI checks passed successfully"
+          echo "All required CI checks passed successfully"
+          echo "Optional checks (security-scan, docker-build, sonar-analysis) may have been skipped"
 

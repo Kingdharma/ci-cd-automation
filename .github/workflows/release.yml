@@ -250,6 +250,8 @@ jobs:
           # Or add your deployment logic here
 
       - name: Notify deployment
+        if: secrets.SLACK_WEBHOOK_URL != ''
+        continue-on-error: true
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
@@ -269,6 +271,8 @@ jobs:
           # Add your documentation update script
 
       - name: Notify stakeholders
+        if: secrets.SLACK_WEBHOOK_URL != ''
+        continue-on-error: true
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}

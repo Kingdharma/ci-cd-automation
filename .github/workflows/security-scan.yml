@@ -84,6 +84,7 @@ jobs:
           cache: 'maven'
 
       - name: Run Snyk to check for vulnerabilities
+        if: secrets.SNYK_TOKEN != ''
         uses: snyk/actions/maven@master
         continue-on-error: true
         env:
