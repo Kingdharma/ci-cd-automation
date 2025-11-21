@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: springboot-production-app
+    runtime: java
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/springboot-production-app-*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 8
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: PORT
+        value: 8080
+      - key: DATABASE_URL
+        fromDatabase:
+          name: springboot-production-db
+          property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: springboot-production-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: springboot-production-db
+          property: password
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+
+databases:
+  - name: springboot-production-db
+    databaseName: production_db
+    user: postgres
+    plan: starter
+    region: oregon
+

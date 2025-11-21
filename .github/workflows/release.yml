@@ -157,19 +157,21 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ needs.validate-release.outputs.version }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image (for local testing only)
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
-      - name: Image digest
-        run: echo ${{ steps.meta.outputs.digest }}
+      - name: Note
+        run: |
+          echo "Docker image built locally for testing"
+          echo "Render will build and deploy from source code automatically"
 
   # Create GitHub Release
   create-release:
@@ -232,22 +234,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Deploy to production
-  deploy-production:
-    name: Deploy to Production
+  # Notify Render deployment
+  notify-render:
+    name: Notify Render Deployment
     runs-on: ubuntu-latest
     needs: [create-release]
-    environment:
-      name: production
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Trigger production deployment
+      - name: Notify Render deployment
         run: |
-          echo "Triggering production deployment for version ${{ needs.validate-release.outputs.version }}"
-          # This will trigger the CD workflow
-          # Or add your deployment logic here
+          echo "Release ${{ needs.validate-release.outputs.version }} created"
+          echo "Render will automatically deploy from GitHub when connected"
+          echo "Make sure your Render service is connected to this repository"
 
       - name: Notify deployment
         if: secrets.SLACK_WEBHOOK_URL != ''
@@ -255,7 +252,7 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          text: 'Production release ${{ needs.validate-release.outputs.version }} deployed'
+          text: 'Release ${{ needs.validate-release.outputs.version }} created - Render will auto-deploy'
           webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   # Post-release tasks
