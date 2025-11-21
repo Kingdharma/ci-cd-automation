@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload OWASP Dependency Check results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: owasp-dependency-check
           path: reports/
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload Snyk results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: snyk-results
           path: snyk-results.json
@@ -137,7 +137,7 @@ jobs:
 
       - name: Upload Trivy results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: trivy-container-results
           path: trivy-container-results.sarif
